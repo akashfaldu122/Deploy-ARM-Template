@@ -101,5 +101,20 @@
         "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
       ]
     }
-  ]
+  ],
+  "outputs": {
+  "sqlServerFQDN": {
+    "type": "string",
+    "value": "[reference(parameters('sqlServerName')).fullyQualifiedDomainName]"
+  },
+  "databaseName": {
+    "type": "string",
+    "value": "bankingdb"
+  },
+  "sqlAdminUsername": {
+    "type": "string",
+    "value": "[parameters('adminLogin')]"
+  }
+}
+
 }
