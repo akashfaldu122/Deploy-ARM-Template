@@ -94,7 +94,7 @@
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
         "principalId": "596636ed-8a3d-4404-8fc0-9a3a9cd17bf1",
-        "scope": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+        "scope": "[resourceGroup().id]"
       }
     },
     {
