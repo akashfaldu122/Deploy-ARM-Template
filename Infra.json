@@ -38,6 +38,16 @@
       }
     },
     {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2021-02-01-preview",
+      "name": "[format('{0}/{1}', parameters('sqlServerName'), 'bankingdb')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
+      ],
+      "properties": {}
+    },
+    {
       "type": "Microsoft.KeyVault/vaults",
       "apiVersion": "2022-07-01",
       "name": "[parameters('keyVaultName')]",
