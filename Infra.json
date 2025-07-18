@@ -103,18 +103,17 @@
     }
   ],
   "outputs": {
-  "sqlServerFQDN": {
-    "type": "string",
-    "value": "[reference(resourceId('Microsoft.Sql/servers', parameters('sqlServerName')), '2021-02-01-preview').fullyQualifiedDomainName]"
-  },
-  "databaseName": {
-    "type": "string",
-    "value": "bankingdb"
-  },
-  "sqlAdminUsername": {
-    "type": "string",
-    "value": "[parameters('adminLogin')]"
+    "sqlServerFQDN": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Sql/servers', parameters('sqlServerName')), '2021-02-01-preview').fullyQualifiedDomainName]"
+    },
+    "databaseName": {
+      "type": "string",
+      "value": "bankingdb"
+    },
+    "sqlAdminUsername": {
+      "type": "string",
+      "value": "[parameters('adminLogin')]"
+    }
   }
-}
-
 }
