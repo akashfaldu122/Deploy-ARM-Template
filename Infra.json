@@ -90,21 +90,6 @@
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
-      "name": "[guid(parameters('keyVaultName'), 'AzureDevOpsKeyVaultAccess')]",
-      "properties": {
-        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",  // Key Vault Secrets Officer
-        "principalId": "596636ed-8a3d-4404-8fc0-9a3a9cd17bf1",
-        "scope": "[resourceGroup().id]"
-      },
-      
-      "dependsOn": [
-        "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2022-04-01",
       "name": "[guid(resourceGroup().id, parameters('aksClusterName'), 'KeyVaultAccess')]",
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
