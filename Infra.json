@@ -110,6 +110,19 @@
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
+      "name": "[guid(resourceGroup().id, parameters('aksClusterName'), 'KeyVaultSecretsUser')]",
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
+        "principalId": "6c7fb207-a77b-4149-a800-b995f6070245",
+        "scope": "[resourceGroup().id]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
       "name": "[guid(resourceGroup().id, parameters('devOpsServicePrincipalObjectId'), 'KeyVaultSecretsOfficer')]",
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
