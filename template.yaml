@@ -1,0 +1,44 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+parameters:
+  - name: containerregistry
+    type: string
+
+steps:
+- task: JavaToolInstaller@1
+  inputs:
+    versionSpec: '17'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'
+- task: Maven@4
+  inputs:
+    azureSubscription: 'Azure-Terraform'
+    mavenPomFile: 'pom.xml'
+    goals: 'clean package -DskipTests'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    javaHomeOption: 'JDKVersion'
+    mavenVersionOption: 'Default'
+    mavenAuthenticateFeed: false
+    effectivePomSkip: false
+    sonarQubeRunAnalysis: false
+
+- task: Docker@2
+  inputs:
+    containerRegistry: ${{ parameters.containerregistry }}
+    repository: 'akash'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+
+- task: CopyFiles@2
+  inputs:
+    Contents: 'azure-aks.yaml'
+    TargetFolder: '$(build.artifactstagingdirectory)'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
