@@ -87,7 +87,7 @@
       "name": "[parameters('aksClusterName')]",
       "location": "[parameters('location')]",
       "identity": {
-        "type": "SystemAssigned, UserAssigned",  // changed here
+        "type": "UserAssigned",
         "userAssignedIdentities": {
           "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('aksKubeletIdentityName'))]": {}
         }
