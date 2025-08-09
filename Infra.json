@@ -30,11 +30,17 @@
         "description": "Object ID of Azure DevOps Service Principal to be granted Key Vault Secrets Officer role."
       }
     },
-    // New parameter for kubelet UAMI name
     "aksKubeletIdentityName": {
       "type": "string",
       "defaultValue": "aks-kubelet-identity"
     }
+  },
+  "variables": {
+    "keyVaultResourceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+    "aksKubeletIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('aksKubeletIdentityName'))]",
+    "roleDefinitionIdKeyVaultSecretsUser": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
+    "roleDefinitionIdKeyVaultSecretsOfficer": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
+    "roleDefinitionIdContributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]"
   },
   "resources": [
     {
@@ -72,15 +78,12 @@
         "enableRbacAuthorization": true
       }
     },
-
-    // Create User Assigned Managed Identity for kubelets
     {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
       "apiVersion": "2023-01-31",
       "name": "[parameters('aksKubeletIdentityName')]",
       "location": "[parameters('location')]"
     },
-
     {
       "type": "Microsoft.ContainerService/managedClusters",
       "apiVersion": "2023-04-01",
@@ -89,7 +92,7 @@
       "identity": {
         "type": "UserAssigned",
         "userAssignedIdentities": {
-          "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('aksKubeletIdentityName'))]": {}
+          "[variables('aksKubeletIdentityResourceId')]": {}
         }
       },
       "properties": {
@@ -108,53 +111,37 @@
           "clientId": "msi"
         },
         "enableRBAC": true
-      }
+      },
+      "dependsOn": [
+        "[variables('aksKubeletIdentityResourceId')]"
+      ]
     },
-
-    // Role assignment for cluster control plane identity (System assigned MSI)
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
-      "name": "[guid(resourceGroup().id, parameters('aksClusterName'), 'AKSKeyVaultUser')]",
+      "name": "[guid(variables('keyVaultResourceId'), parameters('aksClusterName'), 'AKSKeyVaultUser')]",
       "properties": {
-        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
+        "roleDefinitionId": "[variables('roleDefinitionIdContributor')]",
         "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01', 'Full').identity.principalId]",
         "scope": "[resourceGroup().id]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+        "[variables('keyVaultResourceId')]"
       ]
     },
-
-    // Role assignment for kubelet identity UAMI
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
-      "name": "[guid(resourceGroup().id, parameters('aksKubeletIdentityName'), 'KubeletKeyVaultSecretsUser')]",
+      "name": "[guid(variables('aksKubeletIdentityResourceId'), parameters('aksKubeletIdentityName'), 'KubeletKeyVaultSecretsUser')]",
       "properties": {
-        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
-        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('aksKubeletIdentityName')), '2018-11-30').principalId]",
-        "scope": "[resourceGroup().id]"
+        "roleDefinitionId": "[variables('roleDefinitionIdKeyVaultSecretsUser')]",
+        "principalId": "[reference(variables('aksKubeletIdentityResourceId'), '2018-11-30').principalId]",
+        "scope": "[variables('keyVaultResourceId')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('aksKubeletIdentityName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
-      ]
-    },
-
-    // Existing role assignment (if needed)
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "name": "[guid(resourceGroup().id, parameters('aksClusterName'), 'KeyVaultSecretsUser')]",
-      "properties": {
-        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
-        "principalId": "6c7fb207-a77b-4149-a800-b995f6070245",
-        "scope": "[resourceGroup().id]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+        "[variables('aksKubeletIdentityResourceId')]",
+        "[variables('keyVaultResourceId')]"
       ]
     },
     {
@@ -162,12 +149,12 @@
       "apiVersion": "2022-04-01",
       "name": "[guid(resourceGroup().id, parameters('devOpsServicePrincipalObjectId'), 'KeyVaultSecretsOfficer')]",
       "properties": {
-        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
+        "roleDefinitionId": "[variables('roleDefinitionIdKeyVaultSecretsOfficer')]",
         "principalId": "[parameters('devOpsServicePrincipalObjectId')]",
-        "scope": "[resourceGroup().id]"
+        "scope": "[variables('keyVaultResourceId')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+        "[variables('keyVaultResourceId')]"
       ]
     }
   ],
