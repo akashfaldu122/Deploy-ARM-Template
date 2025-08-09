@@ -108,6 +108,20 @@
       ]
     },
     {
+      "type": "Microsoft.Authorization/roleAssignments",    //if you want to fetch the secret directly from keyvault while using database, you have to install Secrets Store CSI Driver and Azure Key Vault Provider, so basiaclly this driver fetch the secret from keyvault...so we have to give the permission to kubelet for fetching secret...because csi driver goes to kubelet and kubelet will make a request to keyvault.
+      "apiVersion": "2022-04-01",
+      "name": "[guid(resourceGroup().id, parameters('aksClusterName'), 'KubeletKeyVaultSecretsUser')]", // 🔹 CHANGED - new name for kubelet assignment
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]", // 🔹 Key Vault Secrets User
+        "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01', 'Full').identityProfile.kubeletidentity.objectId]", // 🔹 NEW: uses kubeletidentity instead of cluster identity
+        "scope": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]" // 🔹 Restrict scope to the vault
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+      ]
+    },
+    {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
       "name": "[guid(resourceGroup().id, parameters('aksClusterName'), 'KeyVaultSecretsUser')]",
