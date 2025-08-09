@@ -29,6 +29,11 @@
       "metadata": {
         "description": "Object ID of Azure DevOps Service Principal to be granted Key Vault Secrets Officer role."
       }
+    },
+    // New parameter for kubelet UAMI name
+    "aksKubeletIdentityName": {
+      "type": "string",
+      "defaultValue": "aks-kubelet-identity"
     }
   },
   "resources": [
@@ -67,13 +72,25 @@
         "enableRbacAuthorization": true
       }
     },
+
+    // Create User Assigned Managed Identity for kubelets
+    {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "apiVersion": "2023-01-31",
+      "name": "[parameters('aksKubeletIdentityName')]",
+      "location": "[parameters('location')]"
+    },
+
     {
       "type": "Microsoft.ContainerService/managedClusters",
       "apiVersion": "2023-04-01",
       "name": "[parameters('aksClusterName')]",
       "location": "[parameters('location')]",
       "identity": {
-        "type": "SystemAssigned"
+        "type": "SystemAssigned, UserAssigned",  // changed here
+        "userAssignedIdentities": {
+          "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('aksKubeletIdentityName'))]": {}
+        }
       },
       "properties": {
         "dnsPrefix": "[parameters('dnsPrefix')]",
@@ -93,6 +110,8 @@
         "enableRBAC": true
       }
     },
+
+    // Role assignment for cluster control plane identity (System assigned MSI)
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
@@ -107,20 +126,24 @@
         "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
       ]
     },
+
+    // Role assignment for kubelet identity UAMI
     {
-      "type": "Microsoft.Authorization/roleAssignments",    //if you want to fetch the secret directly from keyvault while using database, you have to install Secrets Store CSI Driver and Azure Key Vault Provider, so basiaclly this driver fetch the secret from keyvault...so we have to give the permission to kubelet for fetching secret...because csi driver goes to kubelet and kubelet will make a request to keyvault.
+      "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
-      "name": "[guid(resourceGroup().id, parameters('aksClusterName'), 'KubeletKeyVaultSecretsUser')]", // 🔹 CHANGED - new name for kubelet assignment
+      "name": "[guid(resourceGroup().id, parameters('aksKubeletIdentityName'), 'KubeletKeyVaultSecretsUser')]",
       "properties": {
-        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]", // 🔹 Key Vault Secrets User
-        "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01', 'Full').identityProfile.kubeletidentity.objectId]", // 🔹 NEW: uses kubeletidentity instead of cluster identity
-        "scope": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]" // 🔹 Restrict scope to the vault
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('aksKubeletIdentityName')), '2018-11-30').principalId]",
+        "scope": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('aksKubeletIdentityName'))]",
         "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
       ]
     },
+
+    // Existing role assignment (if needed)
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
