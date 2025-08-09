@@ -135,7 +135,7 @@
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
         "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('aksKubeletIdentityName')), '2018-11-30').principalId]",
-        "scope": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+        "scope": "[resourceGroup().id]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('aksKubeletIdentityName'))]",
