@@ -9,7 +9,7 @@
       "value": "akashdbserver"
     },
     "adminLogin": {
-      "value": "mydb@akashdbserver"
+      "value": "mydb"
     },
     "adminPassword": {
       "value": "YourSecurePassword123!"
