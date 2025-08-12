@@ -6,10 +6,10 @@
       "value": "eastus2"
     },
     "sqlServerName": {
-      "value": "bankingsqlserver01"
+      "value": "akashdbserver"
     },
     "adminLogin": {
-      "value": "sqladminuser"
+      "value": "mydb@akashdbserver"
     },
     "adminPassword": {
       "value": "YourSecurePassword123!"
