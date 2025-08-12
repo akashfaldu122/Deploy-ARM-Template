@@ -46,7 +46,7 @@
     {
       "type": "Microsoft.Sql/servers/databases",
       "apiVersion": "2021-02-01-preview",
-      "name": "[format('{0}/{1}', parameters('sqlServerName'), 'bankingdb')]",
+      "name": "[format('{0}/{1}', parameters('sqlServerName'), 'akashdb')]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
