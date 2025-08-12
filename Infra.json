@@ -141,7 +141,7 @@
     },
     "databaseName": {
       "type": "string",
-      "value": "bankingdb"
+      "value": "akashdb"
     },
     "sqlAdminUsername": {
       "type": "string",
