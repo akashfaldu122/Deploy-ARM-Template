@@ -31,6 +31,10 @@
       }
     }
   },
+  "variables": {
+    "aksPublicIpResourceId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01').properties.networkProfile.loadBalancerProfile.effectiveOutboundIPs[0].id]",
+    "aksOutboundIp": "[reference(variables('aksPublicIpResourceId'), '2020-11-01').ipAddress]"
+  },
   "resources": [
     {
       "type": "Microsoft.Sql/servers",
@@ -103,8 +107,8 @@
         "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]"
       ],
       "properties": {
-        "startIpAddress": "[reference(reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01').properties.networkProfile.loadBalancerProfile.effectiveOutboundIPs[0].id, '2020-11-01').ipAddress]",
-        "endIpAddress": "[reference(reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01').properties.networkProfile.loadBalancerProfile.effectiveOutboundIPs[0].id, '2020-11-01').ipAddress]"
+        "startIpAddress": "[variables('aksOutboundIp')]",
+        "endIpAddress": "[variables('aksOutboundIp')]"
       }
     },
     {
@@ -160,6 +164,10 @@
     "sqlAdminUsername": {
       "type": "string",
       "value": "[parameters('adminLogin')]"
+    },
+    "aksOutboundIp": {
+      "type": "string",
+      "value": "[variables('aksOutboundIp')]"
     }
   }
 }
