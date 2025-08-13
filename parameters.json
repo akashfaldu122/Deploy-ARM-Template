@@ -25,6 +25,9 @@
     },
     "devOpsServicePrincipalObjectId": {
       "value": "3b1bc61a-fb78-4d6c-a654-66f69782f546"
+    },
+    "acrName": {
+      "value": "akashconreg"
     }
   }
 }
