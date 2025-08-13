@@ -29,6 +29,12 @@
       "metadata": {
         "description": "Object ID of Azure DevOps Service Principal to be granted Key Vault Secrets Officer role."
       }
+    },
+    "acrName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of Azure Container Registry"
+      }
     }
   },
   "resources": [
@@ -94,6 +100,18 @@
       }
     },
     {
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[parameters('acrName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Basic"
+      },
+      "properties": {
+        "adminUserEnabled": true
+      }
+    },
+    {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
       "name": "[guid(resourceGroup().id, parameters('aksClusterName'), 'AKSKeyVaultUser')]",
@@ -132,6 +150,20 @@
       "dependsOn": [
         "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
       ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(resourceGroup().id, parameters('acrName'), 'AcrPushRoleForAKS')]",
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8311e382-0749-4cb8-b61a-304f252e45ec')]",
+        "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01', 'Full').identity.principalId]",
+        "scope": "[resourceId('Microsoft.ContainerRegistry/registries', parameters('acrName'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ContainerRegistry/registries', parameters('acrName'))]",
+        "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]"
+      ]
     }
   ],
   "outputs": {
@@ -146,6 +178,10 @@
     "sqlAdminUsername": {
       "type": "string",
       "value": "[parameters('adminLogin')]"
+    },
+    "acrLoginServer": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries', parameters('acrName')), '2023-01-01-preview').loginServer]"
     }
   }
 }
