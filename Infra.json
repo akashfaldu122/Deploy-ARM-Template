@@ -158,7 +158,7 @@
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8311e382-0749-4cb8-b61a-304f252e45ec')]",
         "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01', 'Full').identity.principalId]",
-        "scope": "[resourceId('Microsoft.ContainerRegistry/registries', parameters('acrName'))]"
+        "scope": "[resourceGroup().id]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.ContainerRegistry/registries', parameters('acrName'))]",
