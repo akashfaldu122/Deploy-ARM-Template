@@ -31,10 +31,6 @@
       }
     }
   },
-  "variables": {
-    "aksPublicIpResourceId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01').properties.networkProfile.loadBalancerProfile.effectiveOutboundIPs[0].id]",
-    "aksOutboundIp": "[reference(variables('aksPublicIpResourceId'), '2020-11-01').ipAddress]"
-  },
   "resources": [
     {
       "type": "Microsoft.Sql/servers",
@@ -98,20 +94,6 @@
       }
     },
     {
-      "type": "Microsoft.Sql/servers/firewallRules",
-      "apiVersion": "2021-02-01-preview",
-      "name": "[format('{0}/{1}', parameters('sqlServerName'), 'AllowAKSClusterIP')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]",
-        "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]"
-      ],
-      "properties": {
-        "startIpAddress": "[variables('aksOutboundIp')]",
-        "endIpAddress": "[variables('aksOutboundIp')]"
-      }
-    },
-    {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
       "name": "[guid(resourceGroup().id, parameters('aksClusterName'), 'AKSKeyVaultUser')]",
@@ -164,10 +146,6 @@
     "sqlAdminUsername": {
       "type": "string",
       "value": "[parameters('adminLogin')]"
-    },
-    "aksOutboundIp": {
-      "type": "string",
-      "value": "[variables('aksOutboundIp')]"
     }
   }
 }
