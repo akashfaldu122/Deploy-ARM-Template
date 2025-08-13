@@ -103,8 +103,8 @@
         "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]"
       ],
       "properties": {
-        "startIpAddress": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01').properties.networkProfile.loadBalancerProfile.effectiveOutboundIPs[0].ipAddress]",
-        "endIpAddress": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01').properties.networkProfile.loadBalancerProfile.effectiveOutboundIPs[0].ipAddress]"
+        "startIpAddress": "[reference(reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01').properties.networkProfile.loadBalancerProfile.effectiveOutboundIPs[0].id, '2020-11-01').ipAddress]",
+        "endIpAddress": "[reference(reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01').properties.networkProfile.loadBalancerProfile.effectiveOutboundIPs[0].id, '2020-11-01').ipAddress]"
       }
     },
     {
