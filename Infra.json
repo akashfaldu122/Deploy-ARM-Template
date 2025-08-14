@@ -177,7 +177,7 @@
     },
     "sqlAdminUsername": {
       "type": "string",
-      "value": "[parameters('adminLogin')]"
+      "value": "[format('{0}@{1}', parameters('adminLogin'), parameters('sqlServerName'))]"
     },
     "acrLoginServer": {
       "type": "string",
