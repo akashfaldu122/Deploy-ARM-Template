@@ -118,7 +118,7 @@
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')]",  // AcrPull role
         "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01', 'Full').identity.principalId]",
-        "scope": "[resourceGroup().id]"
+        "scope": "[resourceId('Microsoft.ContainerRegistry/registries', parameters('acrName'))]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.ContainerRegistry/registries', parameters('acrName'))]",
