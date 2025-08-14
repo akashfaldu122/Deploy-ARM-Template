@@ -112,11 +112,11 @@
       }
     },
     {
-      "type": "Microsoft.Authorization/roleAssignments",
+      "type": "Microsoft.ContainerRegistry/registries/providers/roleAssignments",
       "apiVersion": "2022-04-01",
-      "name": "[guid(resourceGroup().id, parameters('aksClusterName'), parameters('acrName'), 'AcrPullRoleForAKS')]",
+      "name": "[format('{0}/Microsoft.Authorization/{1}', parameters('acrName'), guid(resourceId('Microsoft.ContainerRegistry/registries', parameters('acrName')), parameters('aksClusterName'), 'AcrPullRoleForAKS'))]",
       "properties": {
-        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')]",  // AcrPull role
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')]",
         "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-04-01', 'Full').identity.principalId]",
         "scope": "[resourceId('Microsoft.ContainerRegistry/registries', parameters('acrName'))]"
       },
