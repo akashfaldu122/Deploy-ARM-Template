@@ -108,7 +108,7 @@
         "name": "Standard"
       },
       "properties": {
-        "adminUserEnabled": true
+        "adminUserEnabled": true,
         "anonymousPullEnabled": true
       }
     },
