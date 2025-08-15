@@ -13,6 +13,7 @@ steps:
     versionSpec: '17'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'PreInstalled'
+    
 - task: Maven@4
   inputs:
     azureSubscription: 'Azure-Terraform'
@@ -29,7 +30,7 @@ steps:
 - task: Docker@2
   inputs:
     containerRegistry: ${{ parameters.containerregistry }}
-    repository: 'akash'
+    repository: 'akashrepo'
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
 
@@ -37,6 +38,7 @@ steps:
   inputs:
     Contents: 'azure-aks.yaml'
     TargetFolder: '$(build.artifactstagingdirectory)'
+    
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
