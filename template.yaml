@@ -36,7 +36,7 @@ steps:
 
 - task: CopyFiles@2
   inputs:
-    Contents: 'SecretProviderClass.yaml;keyvaultdeployment.yaml'
+    Contents: 'SecretProviderClass.yaml'
     TargetFolder: '$(build.artifactstagingdirectory)'
     
 - task: PublishBuildArtifacts@1
